@@ -163,6 +163,39 @@
     // ===== CHECK CODE =====
     function checkCode() {
       let code = inputEl.value.trim().toUpperCase();
+      // =====================
+      // SECRET RESET CODE
+      // =====================
+      if (code === "RES") {
+
+          // Reset timer
+          remainingSeconds = START_MINUTES * 60;
+          saveTimer();
+          updateTimerDisplay();
+      
+          // Reset used codes
+          usedCodes = [];
+          saveUsedCodes();
+      
+          // Reset game start state
+          localStorage.removeItem("gameStarted");
+      
+          // Show start button again
+          startBtn.style.display = "inline-block";
+      
+          // Disable input fields until Start is pressed
+          inputEl.disabled = true;
+          submitBtn.disabled = true;
+      
+          // Stop the timer
+          if (intervalId) clearInterval(intervalId);
+          intervalId = null;
+      
+          messageEl.textContent = "Game has been reset.";
+      
+          inputEl.value = "";
+          return;
+      }
 
       if (!code) {
         messageEl.textContent = "Please enter a code.";
@@ -236,6 +269,7 @@
 
 </body>
 </html>
+
 
 
 
