@@ -211,6 +211,7 @@
       // Valid code?
       if (!VALID_CODES.includes(code)) {
         messageEl.textContent = "Invalid code.";
+        document.getElementById("failureSound").play();
         inputEl.value = "";
         inputEl.focus();
         return;
@@ -233,6 +234,7 @@
       saveTimer();
 
       messageEl.textContent = `Code accepted! +${BONUS_MINUTES} minutes added.`;
+      document.getElementById("successSound").play();
       inputEl.value = "";
       inputEl.focus();
     }
@@ -270,6 +272,7 @@
 
 </body>
 </html>
+
 
 
 
