@@ -1,35 +1,111 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="100">  
-<title>Escape Room</title>
-<style>
-html,body{height:100%}body{margin:0;display:grid;place-items:center;background:#0b0f19;color:#eaeef8;font:600 clamp(28px,6vw,72px)/1.1 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;padding:2rem;text-align:center}
-h1{margin:0 0 .5rem}
-p{margin:0;font:400 clamp(14px,2.4vw,20px)/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:#9aa4b2}
-a{color:#7dd3fc;text-decoration:none;border:1px solid #1f2a44;padding:.6rem 1rem;border-radius:.75rem;display:inline-block;margin-top:1rem}
-a:hover{background:#111830}
-</style>
+  <meta charset="UTF-8" />
+  <title>Timer Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #timer {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    #message {
+      margin-top: 10px;
+      height: 20px;
+      font-weight: bold;
+    }
+    input[type="number"] {
+      padding: 8px;
+      font-size: 1rem;
+      width: 120px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 1rem;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-<main>
-<h2>This is the hardest escape room ever! It's so fun! Thanks Dad!</h2>
-</main>
+
+  <!-- Game timer (starts from 30 minutes) -->
+  <div id="timer">30:00</div>
+
+  <!-- Input to enter the number -->
+  <input id="answerInput" type="number" placeholder="Enter number" />
+  <button id="submitBtn">Submit</button>
+
+  <div id="message"></div>
+
+  <script>
+    // ===== SETTINGS =====
+    const START_MINUTES = 30;       // starting time in minutes
+    const BONUS_MINUTES = 5;        // minutes to add when correct
+    const CORRECT_NUMBER = 42;      // <--- change this to your desired correct number
+
+    // ===== TIMER LOGIC =====
+    let remainingSeconds = START_MINUTES * 60;
+
+    const timerEl = document.getElementById("timer");
+    const inputEl = document.getElementById("answerInput");
+    const messageEl = document.getElementById("message");
+    const buttonEl = document.getElementById("submitBtn");
+
+    // Update the timer on the page every second (no refresh needed)
+    const intervalId = setInterval(() => {
+      if (remainingSeconds <= 0) {
+        timerEl.textContent = "00:00";
+        messageEl.textContent = "Time is up!";
+        clearInterval(intervalId); // stop the timer
+        return;
+      }
+
+      remainingSeconds--;
+
+      const minutes = Math.floor(remainingSeconds / 60);
+      const seconds = remainingSeconds % 60;
+
+      // Format as MM:SS
+      timerEl.textContent =
+        String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }, 1000);
+
+    // ===== CHECK ANSWER =====
+    function checkAnswer() {
+      const userValue = Number(inputEl.value);
+
+      if (!inputEl.value) {
+        messageEl.textContent = "Please enter a number.";
+        return;
+      }
+
+      if (userValue === CORRECT_NUMBER) {
+        // add bonus time
+        remainingSeconds += BONUS_MINUTES * 60;
+        messageEl.textContent = `Correct! +${BONUS_MINUTES} minutes added.`;
+      } else {
+        messageEl.textContent = "Wrong number. Try again!";
+      }
+
+      inputEl.value = "";
+      inputEl.focus();
+    }
+
+    buttonEl.addEventListener("click", checkAnswer);
+
+    // Optional: allow pressing Enter key to submit
+    inputEl.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+  </script>
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
