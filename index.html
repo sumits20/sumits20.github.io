@@ -2,109 +2,236 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Timer Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    #timer {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    #message {
-      margin-top: 10px;
-      height: 20px;
-      font-weight: bold;
-    }
-    input[type="number"] {
-      padding: 8px;
-      font-size: 1rem;
-      width: 120px;
-    }
-    button {
-      padding: 8px 16px;
-      font-size: 1rem;
-      margin-left: 5px;
-      cursor: pointer;
-    }
-  </style>
+  <title>Timer Code Game</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  /* HUGE RED TIMER */
+  #timer {
+    font-size: 8rem;        /* HUGE */
+    font-weight: 900;       /* extra bold */
+    color: red;             /* RED */
+    margin-bottom: 30px;
+    text-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+  }
+
+  #message {
+    margin-top: 10px;
+    height: 20px;
+    font-weight: bold;
+  }
+
+  input[type="text"] {
+    padding: 10px;
+    font-size: 1.2rem;
+    width: 160px;
+    text-transform: uppercase;
+  }
+
+  button {
+    padding: 12px 22px;
+    font-size: 1.1rem;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-  <!-- Game timer (starts from 30 minutes) -->
   <div id="timer">30:00</div>
 
-  <!-- Input to enter the number -->
-  <input id="answerInput" type="number" placeholder="Enter number" />
-  <button id="submitBtn">Submit</button>
+  <button id="startBtn">Start Game</button>
+
+  <br><br>
+
+  <!-- Code input -->
+  <input
+    id="answerInput"
+    type="text"
+    placeholder="Enter 3-char code"
+    maxlength="3"
+    disabled
+  />
+  <button id="submitBtn" disabled>Submit</button>
 
   <div id="message"></div>
 
   <script>
     // ===== SETTINGS =====
-    const START_MINUTES = 30;       // starting time in minutes
-    const BONUS_MINUTES = 5;        // minutes to add when correct
-    const CORRECT_NUMBER = 42;      // <--- change this to your desired correct number
+    const START_MINUTES = 30;
+    const BONUS_MINUTES = 5;
 
-    // ===== TIMER LOGIC =====
+    // 👉 REPLACE THESE 12 CODES WITH YOUR OWN (3 characters each, letters/numbers)
+    const VALID_CODES = [
+      "A1B",
+      "C3D",
+      "X9Z",
+      "4QW",
+      "M7N",
+      "P2K",
+      "L8R",
+      "T5Y",
+      "B6C",
+      "H2J",
+      "R4S",
+      "Z0X"
+    ];
+
     let remainingSeconds = START_MINUTES * 60;
+    let intervalId = null;
+    let usedCodes = [];
 
     const timerEl = document.getElementById("timer");
     const inputEl = document.getElementById("answerInput");
     const messageEl = document.getElementById("message");
-    const buttonEl = document.getElementById("submitBtn");
+    const startBtn = document.getElementById("startBtn");
+    const submitBtn = document.getElementById("submitBtn");
 
-    // Update the timer on the page every second (no refresh needed)
-    const intervalId = setInterval(() => {
-      if (remainingSeconds <= 0) {
-        timerEl.textContent = "00:00";
-        messageEl.textContent = "Time is up!";
-        clearInterval(intervalId); // stop the timer
-        return;
+    // ===== RESTORE TIMER FROM LOCAL STORAGE =====
+    function loadTimer() {
+      const saved = localStorage.getItem("remainingSeconds");
+      const lastUpdate = localStorage.getItem("lastTimestamp");
+
+      if (saved && lastUpdate) {
+        const secondsPassed = Math.floor((Date.now() - Number(lastUpdate)) / 1000);
+        remainingSeconds = Math.max(0, Number(saved) - secondsPassed);
+      } else {
+        remainingSeconds = START_MINUTES * 60;
       }
 
-      remainingSeconds--;
+      updateTimerDisplay();
+    }
 
+    // ===== SAVE TIMER TO LOCAL STORAGE =====
+    function saveTimer() {
+      localStorage.setItem("remainingSeconds", remainingSeconds);
+      localStorage.setItem("lastTimestamp", Date.now());
+    }
+
+    // ===== UPDATE DISPLAY =====
+    function updateTimerDisplay() {
       const minutes = Math.floor(remainingSeconds / 60);
       const seconds = remainingSeconds % 60;
 
-      // Format as MM:SS
       timerEl.textContent =
         String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-    }, 1000);
+    }
 
-    // ===== CHECK ANSWER =====
-    function checkAnswer() {
-      const userValue = Number(inputEl.value);
+    // ===== LOAD USED CODES =====
+    function loadUsedCodes() {
+      const savedCodes = localStorage.getItem("usedCodes");
+      if (savedCodes) {
+        try {
+          usedCodes = JSON.parse(savedCodes);
+        } catch {
+          usedCodes = [];
+        }
+      } else {
+        usedCodes = [];
+      }
+    }
 
-      if (!inputEl.value) {
-        messageEl.textContent = "Please enter a number.";
+    // ===== SAVE USED CODES =====
+    function saveUsedCodes() {
+      localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+    }
+
+    // ===== START TIMER =====
+    function startTimer() {
+      if (intervalId) return;
+
+      intervalId = setInterval(() => {
+        if (remainingSeconds <= 0) {
+          remainingSeconds = 0;
+          updateTimerDisplay();
+          messageEl.textContent = "Time is up!";
+          clearInterval(intervalId);
+          return;
+        }
+
+        remainingSeconds--;
+        updateTimerDisplay();
+        saveTimer();
+      }, 1000);
+    }
+
+    // ===== CHECK CODE =====
+    function checkCode() {
+      let code = inputEl.value.trim().toUpperCase();
+
+      if (!code) {
+        messageEl.textContent = "Please enter a code.";
         return;
       }
 
-      if (userValue === CORRECT_NUMBER) {
-        // add bonus time
-        remainingSeconds += BONUS_MINUTES * 60;
-        messageEl.textContent = `Correct! +${BONUS_MINUTES} minutes added.`;
-      } else {
-        messageEl.textContent = "Wrong number. Try again!";
+      if (code.length !== 3) {
+        messageEl.textContent = "Code must be 3 characters.";
+        return;
       }
 
+      // Valid code?
+      if (!VALID_CODES.includes(code)) {
+        messageEl.textContent = "Invalid code.";
+        inputEl.value = "";
+        inputEl.focus();
+        return;
+      }
+
+      // Already used?
+      if (usedCodes.includes(code)) {
+        messageEl.textContent = "This code has already been used.";
+        inputEl.value = "";
+        inputEl.focus();
+        return;
+      }
+
+      // ✅ Correct & unused code
+      usedCodes.push(code);
+      saveUsedCodes();
+
+      remainingSeconds += BONUS_MINUTES * 60;
+      updateTimerDisplay();
+      saveTimer();
+
+      messageEl.textContent = `Code accepted! +${BONUS_MINUTES} minutes added.`;
       inputEl.value = "";
       inputEl.focus();
     }
 
-    buttonEl.addEventListener("click", checkAnswer);
+    // ===== START BUTTON CLICK =====
+    startBtn.addEventListener("click", () => {
+      startTimer();
+      saveTimer();
 
-    // Optional: allow pressing Enter key to submit
-    inputEl.addEventListener("keyup", (event) => {
-      if (event.key === "Enter") {
-        checkAnswer();
-      }
+      inputEl.disabled = false;
+      submitBtn.disabled = false;
+
+      startBtn.style.display = "none";
+      localStorage.setItem("gameStarted", "true");
     });
+
+    // ===== RESTORE GAME STATE ON LOAD =====
+    loadUsedCodes();
+    loadTimer();
+
+    if (localStorage.getItem("gameStarted") === "true") {
+      startBtn.style.display = "none";
+      inputEl.disabled = false;
+      submitBtn.disabled = false;
+      startTimer();
+    }
+
+    submitBtn.addEventListener("click", checkCode);
+    inputEl.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") checkCode();
+    });
+
+    updateTimerDisplay();
   </script>
 
 </body>
