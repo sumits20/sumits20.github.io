@@ -61,7 +61,8 @@
   <button id="submitBtn" disabled>Enter</button>
 
   <div id="message"></div>
-
+  <div id="liveMessage" style="margin-top:30px; font-size:12rem; font-weight:bold;"></div>
+  
   <script>
     // ===== SETTINGS =====
     const START_MINUTES = 30;
@@ -272,10 +273,45 @@
     });
 
     updateTimerDisplay();
+    // ===== DYNAMIC LIVE MESSAGE SETTINGS =====
+    
+    const MESSAGE_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/current-message.txt";
+    const MESSAGE_POLL_INTERVAL_MS = 5000; // check every 5 seconds
+
+    const liveMessageEl = document.getElementById("liveMessage");
+    let lastMessageText = null;
+
+    async function fetchLiveMessage() {
+      try {
+        // Cache-buster query so GitHub doesn’t serve an old cached version
+        const response = await fetch(MESSAGE_URL + "?t=" + Date.now());
+        if (!response.ok) {
+          console.warn("Failed to fetch live message:", response.status);
+          return;
+        }
+
+        const text = (await response.text()).trim();
+
+        // Only update DOM if message actually changed
+        if (text !== lastMessageText) {
+          lastMessageText = text;
+          liveMessageEl.textContent = text;
+        }
+      } catch (err) {
+        console.error("Error fetching live message:", err);
+      }
+    }
+
+    // Start polling for live messages
+    fetchLiveMessage(); // initial fetch
+    setInterval(fetchLiveMessage, MESSAGE_POLL_INTERVAL_MS);
+
+    
   </script>
 
 </body>
 </html>
+
 
 
 
