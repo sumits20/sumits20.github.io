@@ -294,15 +294,15 @@
               if (text !== lastMessageText) {
                 lastMessageText = text;
                 liveMessageEl.textContent = text;
+                
                 if (messageBeepEl) {
-                 try {
-                   messageBeepEl.currentTime = 0; // restart from beginning
-                   messageBeepEl.play();
-                } catch (e) {
-                // ignore if autoplay blocked
-              }
-              
-              }
+                  try {
+                    messageBeepEl.currentTime = 0; // restart from beginning
+                    messageBeepEl.play();
+                  } catch (e) {
+                        // ignore if autoplay blocked
+                  }
+                } 
             } else {
               // Optional: you could log or show an error if needed
               // console.warn("Failed to fetch live message:", xhr.status);
@@ -326,6 +326,7 @@
 
 </body>
 </html>
+
 
 
 
