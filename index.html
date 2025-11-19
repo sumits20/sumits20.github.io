@@ -67,7 +67,7 @@
     const START_MINUTES = 30;
     const BONUS_MINUTES = 5;
 
-    // 👉 REPLACE THESE 12 CODES WITH YOUR OWN (3 characters each, letters/numbers)
+    // REPLACE THESE 12 CODES WITH YOUR OWN (3 characters each, letters/numbers)
     const VALID_CODES = [
       "A1B",
       "C3D",
@@ -211,6 +211,7 @@
       // Valid code?
       if (!VALID_CODES.includes(code)) {
         messageEl.textContent = "Invalid code.";
+        remainingSeconds -= 10;
         document.getElementById("failureSound").play();
         inputEl.value = "";
         inputEl.focus();
@@ -225,7 +226,7 @@
         return;
       }
 
-      // ✅ Correct & unused code
+      // Correct & unused code
       usedCodes.push(code);
       saveUsedCodes();
 
@@ -272,6 +273,7 @@
 
 </body>
 </html>
+
 
 
 
