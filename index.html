@@ -279,6 +279,8 @@
     const MESSAGE_POLL_INTERVAL_MS = 2000; // 2 seconds
     let lastMessageText = null;
 
+    const messageBeepEl = document.getElementById("messageBeep");
+    
     function fetchLiveMessage() {
       if (!liveMessageEl) return;
 
@@ -292,6 +294,14 @@
               if (text !== lastMessageText) {
                 lastMessageText = text;
                 liveMessageEl.textContent = text;
+                if (messageBeepEl) {
+                 try {
+                   messageBeepEl.currentTime = 0; // restart from beginning
+                   messageBeepEl.play();
+                } catch (e) {
+                // ignore if autoplay blocked
+              }
+              
               }
             } else {
               // Optional: you could log or show an error if needed
@@ -316,6 +326,7 @@
 
 </body>
 </html>
+
 
 
 
