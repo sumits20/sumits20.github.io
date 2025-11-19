@@ -273,44 +273,50 @@
     });
 
     updateTimerDisplay();
-    // ===== DYNAMIC LIVE MESSAGE SETTINGS =====
-    
-    const MESSAGE_URL = "https://sumits20.github.io/message.txt";
-    const MESSAGE_POLL_INTERVAL_MS = 5000; // check every 5 seconds
-
+    // ===== DYNAMIC LIVE MESSAGE FROM message.txt =====
     const liveMessageEl = document.getElementById("liveMessage");
+    const MESSAGE_URL = window.location.origin + "/message.txt"; // e.g. https://sumits20.github.io/message.txt
+    const MESSAGE_POLL_INTERVAL_MS = 5000; // 5 seconds
     let lastMessageText = null;
 
-    async function fetchLiveMessage() {
+    function fetchLiveMessage() {
+      if (!liveMessageEl) return;
+
       try {
-        // Cache-buster query so GitHub doesn’t serve an old cached version
-        const response = await fetch(MESSAGE_URL + "?t=" + Date.now());
-        if (!response.ok) {
-          console.warn("Failed to fetch live message:", response.status);
-          return;
-        }
-
-        const text = (await response.text()).trim();
-
-        // Only update DOM if message actually changed
-        if (text !== lastMessageText) {
-          lastMessageText = text;
-          liveMessageEl.textContent = text;
-        }
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", MESSAGE_URL + "?t=" + Date.now(), true); // ?t= to bypass cache
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              var text = xhr.responseText.trim();
+              if (text !== lastMessageText) {
+                lastMessageText = text;
+                liveMessageEl.textContent = text;
+              }
+            } else {
+              // Optional: you could log or show an error if needed
+              // console.warn("Failed to fetch live message:", xhr.status);
+            }
+          }
+        };
+        xhr.send();
       } catch (err) {
-        console.error("Error fetching live message:", err);
+        // Optional: log if you test on desktop
+        // console.error("Error fetching live message:", err);
       }
     }
 
-    // Start polling for live messages
-    fetchLiveMessage(); // initial fetch
+    // Start polling after page load
+    fetchLiveMessage(); // initial load
     setInterval(fetchLiveMessage, MESSAGE_POLL_INTERVAL_MS);
+
 
     
   </script>
 
 </body>
 </html>
+
 
 
 
