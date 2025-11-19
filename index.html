@@ -61,7 +61,7 @@
   <button id="submitBtn" disabled>Enter</button>
 
   <div id="message"></div>
-  <div id="liveMessage" style="margin-top:30px; font-size:6rem; font-weight:bold;"></div>
+  <div id="liveMessage" style="margin-top:30px; font-size:4rem; font-weight:bold;"></div>
   <script>
     // ===== SETTINGS =====
     const START_MINUTES = 30;
@@ -275,7 +275,7 @@
     // ===== DYNAMIC LIVE MESSAGE FROM message.txt =====
     const liveMessageEl = document.getElementById("liveMessage");
     const MESSAGE_URL = window.location.origin + "/message.txt"; // e.g. https://sumits20.github.io/message.txt
-    const MESSAGE_POLL_INTERVAL_MS = 5000; // 5 seconds
+    const MESSAGE_POLL_INTERVAL_MS = 2000; // 2 seconds
     let lastMessageText = null;
 
     function fetchLiveMessage() {
@@ -315,6 +315,7 @@
 
 </body>
 </html>
+
 
 
 
