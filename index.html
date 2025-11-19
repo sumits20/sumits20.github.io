@@ -217,7 +217,9 @@
       // Valid code?
       if (!VALID_CODES.includes(code)) {
         messageEl.textContent = "Invalid code. You lose 10 seconds.";
-        remainingSeconds -= 10;
+        remainingSeconds = Math.max(0, remainingSeconds - 10);
+        updateTimerDisplay();
+        saveTimer();
         document.getElementById("failureSound").play();
         inputEl.value = "";
         inputEl.focus();
@@ -333,6 +335,7 @@
 
 </body>
 </html>
+
 
 
 
