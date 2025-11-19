@@ -47,6 +47,7 @@
   <audio id="successSound" src="sucess.mp3" preload="auto"></audio>
   <audio id="failureSound" src="failure.mp3" preload="auto"></audio>
   <audio id="messageBeep" src="beep.mp3" preload="auto"></audio>
+  <audio id="endSound" src="end.mp3" preload="auto"></audio>
   <button id="startBtn">Start the Escape Room</button>
 
   <br><br>
@@ -155,6 +156,7 @@
           remainingSeconds = 0;
           updateTimerDisplay();
           messageEl.textContent = "Time is up!";
+          document.getElementById("endSound").play();
           clearInterval(intervalId);
           return;
         }
@@ -331,6 +333,7 @@
 
 </body>
 </html>
+
 
 
 
