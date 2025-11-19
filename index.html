@@ -280,42 +280,47 @@
     let lastMessageText = null;
 
     const messageBeepEl = document.getElementById("messageBeep");
-    
-    function fetchLiveMessage() {
-      if (!liveMessageEl) return;
 
-      try {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", MESSAGE_URL + "?t=" + Date.now(), true); // ?t= to bypass cache
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              var text = xhr.responseText.trim();
-              if (text !== lastMessageText) {
-                lastMessageText = text;
-                liveMessageEl.textContent = text;
-                
-                if (messageBeepEl) {
-                  try {
-                    messageBeepEl.currentTime = 0; // restart from beginning
-                    messageBeepEl.play();
-                  } catch (e) {
-                        // ignore if autoplay blocked
-                  }
-                } 
-            } else {
-              // Optional: you could log or show an error if needed
-              // console.warn("Failed to fetch live message:", xhr.status);
+  function fetchLiveMessage() {
+  if (!liveMessageEl) return;
+
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", MESSAGE_URL + "?t=" + Date.now(), true); // ?t= to bypass cache
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) {
+        if (xhr.status === 200) {
+          var text = xhr.responseText.trim();
+
+          if (text !== lastMessageText) {
+            lastMessageText = text;
+            liveMessageEl.textContent = text;
+
+            if (messageBeepEl) {
+              try {
+                messageBeepEl.currentTime = 0; // restart from beginning
+                messageBeepEl.play();
+              } catch (e) {
+                // ignore if autoplay blocked
+              }
             }
           }
-        };
-        xhr.send();
-      } catch (err) {
-        // Optional: log if you test on desktop
-        // console.error("Error fetching live message:", err);
+        } else {
+          // Optional: you could log or show an error if needed
+          // console.warn("Failed to fetch live message:", xhr.status);
+        }
       }
-    }
+    };
 
+    xhr.send();
+  } catch (err) {
+    // Optional: log if you test on desktop
+    // console.error("Error fetching live message:", err);
+  }
+}
+
+    
     // Start polling after page load
     fetchLiveMessage(); // initial load
     setInterval(fetchLiveMessage, MESSAGE_POLL_INTERVAL_MS);
@@ -326,6 +331,7 @@
 
 </body>
 </html>
+
 
 
 
